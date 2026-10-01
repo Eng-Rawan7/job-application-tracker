@@ -125,13 +125,33 @@ def delete_job():
 
     print("Job application deleted successfully!")
 
+def search_jobs():
+    search_term = input("Enter company or position: ")
+
+    cursor.execute(
+        "SELECT id, company, position, status FROM jobs WHERE company LIKE ? OR position LIKE ?",
+        (f"%{search_term}%", f"%{search_term}%")
+    )
+
+    jobs_found = cursor.fetchall()
+
+    if not jobs_found:
+        print("No matching job applications found.")
+        return
+
+    print("\nSearch Results:")
+
+    for job in jobs_found:
+        print(f"{job[0]}. {job[1]} - {job[2]} - {job[3]}")
+
 while True:
     print("\n=== Job Application Tracker ===")
     print("1. Add Job Application")
     print("2. View Job Applications")
     print("3. Update Application Status")
     print("4. Delete Job Application")
-    print("5. Exit")
+    print("5. Search Job Applications")
+    print("6. Exit")
 
     choice = input("Choose an option: ")
 
@@ -144,6 +164,8 @@ while True:
     elif choice == "4":
         delete_job()
     elif choice == "5":
-       break
+        search_jobs()
+    elif choice == "6":
+        break
     else:
         print("Invalid choice.")
