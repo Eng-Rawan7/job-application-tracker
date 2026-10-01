@@ -1,3 +1,19 @@
+import sqlite3
+
+conn = sqlite3.connect("jobs.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company TEXT NOT NULL,
+    position TEXT NOT NULL,
+    status TEXT NOT NULL
+)
+""")
+
+conn.commit()
+
 jobs = []
 
 
@@ -22,28 +38,27 @@ def add_job():
 
     status = statuses.get(status_choice, "Applied")
 
-    job = {
-        "company": company,
-        "position": position,
-        "status": status
-    }
+    cursor.execute(
+        "INSERT INTO jobs (company, position, status) VALUES (?, ?, ?)",
+        (company, position, status)
+    )
 
-    jobs.append(job)
+    conn.commit()
+
     print("Job application added successfully!")
-
-    jobs.append(job)
-    print("Job application added successfully!")
-
 
 def view_jobs():
-    if not jobs:
+    cursor.execute("SELECT id, company, position, status FROM jobs")
+    jobs_from_db = cursor.fetchall()
+
+    if not jobs_from_db:
         print("No job applications yet.")
         return
 
     print("\nJob Applications:")
 
-    for i, job in enumerate(jobs, start=1):
-       print(f"{i}. {job['company']} - {job['position']} - {job['status']}")
+    for job in jobs_from_db:
+        print(f"{job[0]}. {job[1]} - {job[2]} - {job[3]}")
 
 while True:
     print("\n=== Job Application Tracker ===")
