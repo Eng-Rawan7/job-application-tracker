@@ -105,13 +105,33 @@ def update_status():
 
     print("Application status updated successfully!")
 
+def delete_job():
+    cursor.execute("SELECT id, company, position, status FROM jobs")
+    jobs_from_db = cursor.fetchall()
+
+    if not jobs_from_db:
+        print("No job applications yet.")
+        return
+
+    print("\nJob Applications:")
+
+    for job in jobs_from_db:
+        print(f"{job[0]}. {job[1]} - {job[2]} - {job[3]}")
+
+    job_id = input("\nEnter the job ID to delete: ")
+
+    cursor.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+    conn.commit()
+
+    print("Job application deleted successfully!")
 
 while True:
     print("\n=== Job Application Tracker ===")
     print("1. Add Job Application")
     print("2. View Job Applications")
     print("3. Update Application Status")
-    print("4. Exit")
+    print("4. Delete Job Application")
+    print("5. Exit")
 
     choice = input("Choose an option: ")
 
@@ -122,6 +142,8 @@ while True:
     elif choice == "3":
         update_status()
     elif choice == "4":
-        break
+        delete_job()
+    elif choice == "5":
+       break
     else:
         print("Invalid choice.")
